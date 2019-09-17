@@ -31,7 +31,10 @@
                             Delete
                             <i class="fas fa-trash ml-2"></i>
                         </b-button>
-                        <b-button class="btn-info btns">
+                        <b-button
+                            @click="downloadFile(item.filename,item.originalname,item.contentType)"
+                            class="btn-info btns"
+                        >
                             Download
                             <i class="fas fa-file-download ml-2"></i>
                         </b-button>
@@ -44,6 +47,8 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import axios from "axios";
+import fs from "fs";
 
 export default {
     name: "Collections",
@@ -63,6 +68,27 @@ export default {
                 .catch(err => {
                     throw err;
                 });
+        },
+        downloadFile(filename, originalname, type) {
+            return axios({
+                url: `http://localhost:4444/download/${filename}`,
+                method: "post",
+                responseType: "blob"
+            })
+                .then(function(res) {
+                    const blob = new Blob([res.data], {
+                        type: type
+                    });
+                    const downloadElement = document.createElement("a");
+                    const href = window.URL.createObjectURL(blob); //创建下载的链接
+                    downloadElement.href = href;
+                    downloadElement.download = originalname; //下载后文件名
+                    document.body.appendChild(downloadElement);
+                    downloadElement.click(); //点击下载
+                    document.body.removeChild(downloadElement); //下载完成移除元素
+                    window.URL.revokeObjectURL(href); //释放掉blob对象
+                })
+                .catch(err => console.log(err));
         }
     },
     created() {
