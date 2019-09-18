@@ -11,21 +11,34 @@ const getters = {
 
 const actions = {
     async fetchNotes({ commit }) {
-        const response = await axios.get("http://localhost:4444/notes");
-        commit("setNotes", response.data);
+        try {
+            const response = await axios.get("http://localhost:4444/notes");
+            commit("setNotes", response.data);
+        } catch (err) {
+            throw err;
+        }
     },
     async addNotes({ commit }, formData) {
-        const response = await axios.post("http://localhost:4444/note", formData);
-        await this._actions.fetchNotes[0]();
+        try {
+            await axios.post("http://localhost:4444/post/note", formData);
+            await this._actions.fetchNotes[0]();
+        } catch (err) {
+            throw err;
+        }
     },
     async deleteNote({ commit }, id) {
-        await axios.delete(`http://localhost:4444/notes/${id}`);
-        commit("removeNote", id);
+        try {
+            await axios.delete(`http://localhost:4444/notes/${id}`);
+            commit("removeNote", id);
+        } catch (err) {
+            throw err;
+        }
     }
 };
 
 const mutations = {
-    setNotes: (state, datas) => (state.notes = datas.reverse()),
+    setNotes: (state, datas) =>
+        (state.notes = datas.reverse().map(note => ({ ...note, createdAt: new Date(note.createdAt) }))),
     removeNote: (state, id) => (state.notes = state.notes.filter(item => item._id != id))
 };
 

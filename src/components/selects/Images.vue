@@ -2,24 +2,24 @@
     <b-row no-gutters id="collections">
         <b-col
             class="col-12 mx-auto mb-3"
-            v-for="(item, index) in allNotes"
+            v-for="(item, index) in allImages"
             :key="item._id"
             :index="index"
         >
-            <div class="card mb-3 overflow-hidden d-flex flex-column justify-content-around cards">
-                <div class="row no-gutters">
+            <b-card no-body class="overflow-hidden d-flex flex-column justify-content-around cards">
+                <b-row no-gutters>
                     <div class="col-3 text-center px-1" style="font-size:5.4rem;">
-                        <i class="fas fa-clipboard"></i>
+                        <i class="fas fa-file-image"></i>
                     </div>
                     <div class="col-9">
                         <div class="card-body px-3">
-                            <h5 class="card-title text-display text-left">{{item.topic}}</h5>
+                            <h5 class="card-title text-truncate text-left">{{item.originalname}}</h5>
                             <b-row no-gutters>
                                 <b-col class="col-6">
                                     <p class="card-text text-display text-left">
                                         <small class="text-muted">Desc:</small>
                                         <br />
-                                        {{item.note}}
+                                        {{item.description === "" ? item.description = "No description" : item.description}}
                                     </p>
                                 </b-col>
                                 <b-col class="col-5 ml-auto">
@@ -32,35 +32,66 @@
                             </b-row>
                         </div>
                     </div>
-                </div>
+                </b-row>
                 <b-row no-gutters>
                     <b-col class="col-12 m-auto d-flex justify-content-around">
                         <b-button @click="showMsg(item._id)" class="btn-danger btns">
                             Delete
                             <i class="fas fa-trash ml-2"></i>
                         </b-button>
+                        <b-button
+                            @click="downloadFile(item.filename,item.originalname,item.contentType)"
+                            class="btn-info btns"
+                        >
+                            Download
+                            <i class="fas fa-file-download ml-2"></i>
+                        </b-button>
                     </b-col>
                 </b-row>
-            </div>
+            </b-card>
         </b-col>
     </b-row>
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import axios from "axios";
 
 export default {
-    name: "Notes",
+    name: "Images",
     methods: {
-        ...mapActions(["fetchNotes", "deleteNote"]),
+        ...mapActions(["fetchImages", "deleteImage"]),
         showMsg(id) {
             this.deleteMsg = "";
             this.$bvModal
                 .msgBoxConfirm("Confirm delete this item?", { okTitle: "Yes" })
                 .then(value => {
                     if (value) {
-                        this.deleteNote(id);
+                        this.deleteImage(id);
                     }
+                })
+                .catch(err => {
+                    throw err;
+                });
+        },
+        downloadFile(filename, originalname, type) {
+            return axios({
+                url: `http://localhost:4444/download/${filename}`,
+                method: "post",
+                responseType: "blob"
+            })
+                .then(function(res) {
+                    const blob = new Blob([res.data], {
+                        type: type
+                    });
+                    const downloadElement = document.createElement("a");
+                    const href = window.URL.createObjectURL(blob); //创建下载的链接
+                    downloadElement.href = href;
+                    downloadElement.download = originalname; //下载后文件名
+                    document.body.appendChild(downloadElement);
+                    downloadElement.click(); //点击下载
+                    document.body.removeChild(downloadElement); //下载完成移除元素
+                    window.URL.revokeObjectURL(href); //释放掉blob对象
                 })
                 .catch(err => {
                     throw err;
@@ -68,9 +99,9 @@ export default {
         }
     },
     created() {
-        this.fetchNotes();
+        this.fetchImages();
     },
-    computed: mapGetters(["allNotes"])
+    computed: mapGetters(["allImages"])
 };
 </script>
 

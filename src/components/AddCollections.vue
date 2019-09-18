@@ -1,7 +1,7 @@
 <template>
     <b-row class="mb-3" id="add-collections">
-        <b-col class="col-md-7 m-auto shadow">
-            <h1 class="display-4" id="title">clutch collection</h1>
+        <b-col class="col-md-8 m-auto shadow">
+            <h1 class="h1" id="title">clutch collection</h1>
             <form action="http://localhost:4444/logout?_method=DELETE" method="POST" class="mb-3">
                 <button type="submit" class="btn btn-secondary">
                     Log Out
@@ -11,17 +11,13 @@
             <div>
                 <b-tabs content-class="mt-3" fill>
                     <!-- File upload option -->
-                    <FileFrom />
+                    <FileForm />
 
                     <!-- Images upload option -->
-                    <b-tab title="Image">
-                        <p>I'm the second tab</p>
-                    </b-tab>
+                    <ImageForm />
 
                     <!-- Link upload option -->
-                    <b-tab title="Link">
-                        <p>I'm the second tab</p>
-                    </b-tab>
+                    <LinkForm />
 
                     <!-- Note upload option -->
                     <NoteForm />
@@ -35,15 +31,18 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
 import NoteForm from "../components/forms/NoteForm";
-import FileFrom from "../components/forms/FileForm";
+import FileForm from "../components/forms/FileForm";
+import ImageForm from "../components/forms/ImageForm";
+import LinkForm from "../components/forms/LinkForm";
 
 export default {
     name: "AddCollections",
     components: {
         NoteForm,
-        FileFrom
+        FileForm,
+        ImageForm,
+        LinkForm
     }
 };
 </script>

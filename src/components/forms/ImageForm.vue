@@ -1,5 +1,5 @@
 <template>
-    <b-tab title="File" active>
+    <b-tab title="Image">
         <b-alert
             :show="dismissCountDown"
             dismissible
@@ -14,10 +14,11 @@
                     ref="file"
                     type="file"
                     id="file"
+                    multiple="multiple"
                     class="custom-file-input"
                     @change="onSelect"
                 />
-                <label for="file" class="custom-file-label text-left">{{placeholder}}</label>
+                <label for="file" class="custom-file-label text-left text-display">{{placeholder}}</label>
             </div>
             <div class="mb-3">
                 <label for="text" class="float-left">Add Description (optional) :</label>
@@ -34,28 +35,44 @@
 import { mapActions } from "vuex";
 
 export default {
-    name: "FileForm",
+    name: "ImageForm",
     data() {
         return {
-            placeholder: "Choose a File",
+            placeholder: "Choose Images(< 6pic)",
             alertMsg: {
-                fileErr: "No file selected !",
-                fileWarn: "Only file are allowed !",
+                fileErr: "No Image selected !",
+                fileWarn_1: "Only Image are allowed !",
+                fileWarn_2: "Only allow up to five Images !",
                 fileSucc: "Upload succeed !"
             },
             variant: ["danger", "warning", "success"],
             showMsg: "",
             showVariant: "primary",
-            file: "",
+            files: "",
             text: "",
             dismissSecs: 4,
             dismissCountDown: 0
         };
     },
     methods: {
-        ...mapActions(["addCollection"]),
+        ...mapActions(["addImages"]),
+        countDownChanged(dismissCountDown) {
+            this.dismissCountDown = dismissCountDown;
+        },
+        warnAction_1() {
+            this.$refs.file.value = "";
+            this.showMsg = this.alertMsg.fileWarn_1;
+            this.showVariant = this.variant[1];
+            this.dismissCountDown = this.dismissSecs;
+        },
+        warnAction_2() {
+            this.$refs.file.value = "";
+            this.showMsg = this.alertMsg.fileWarn_2;
+            this.showVariant = this.variant[1];
+            this.dismissCountDown = this.dismissSecs;
+        },
         onSelect() {
-            const file = this.$refs.file.files[0];
+            const files = this.$refs.file.files;
             const allowTypes = [
                 "image/jpeg",
                 "image/jpg",
@@ -64,21 +81,23 @@ export default {
                 "image/svg+xml",
                 "image/x-icon"
             ];
-            if (!allowTypes.includes(file.type)) {
-                this.file = file;
-                this.placeholder = file.name;
-            } else {
-                this.$refs.file.value = "";
-                this.showMsg = this.alertMsg.fileWarn;
-                this.showVariant = this.variant[1];
-                this.dismissCountDown = this.dismissSecs;
+            // 判断文件个数
+            if (files.length > 5) return this.warnAction_2();
+            // 判断是否存在非图片文件，有则返回警告msg
+            for (let file of files) {
+                if (!allowTypes.includes(file.type)) {
+                    return this.warnAction_1();
+                }
             }
-        },
-        countDownChanged(dismissCountDown) {
-            this.dismissCountDown = dismissCountDown;
+            // 扩展运算符转换 fileList to Array
+            this.files = [...files];
+            // 处理placeholder显示文件名
+            let str = [];
+            for (let file of files) str.push(file.name);
+            this.placeholder = str.join("、");
         },
         async fileOnSubmit() {
-            if (this.file === "") {
+            if (this.files === "") {
                 // 显示错误提示
                 this.showMsg = this.alertMsg.fileErr;
                 this.showVariant = this.variant[0];
@@ -86,17 +105,20 @@ export default {
             } else {
                 try {
                     const formData = new FormData();
-                    formData.append("file", this.file);
+                    // 上传多文件时，FormData的处理方法
+                    this.files.forEach(file => {
+                        formData.append("image", file);
+                    });
                     formData.append("text", this.text);
-                    await this.addCollection(formData);
+                    await this.addImages(formData);
                     // 显示成功提示
                     this.showMsg = this.alertMsg.fileSucc;
                     this.showVariant = this.variant[2];
                     this.dismissCountDown = this.dismissSecs;
                     // 重新初始化form内容
-                    this.placeholder = "Choose a File";
+                    this.placeholder = "Choose Images(< 6pic)";
                     this.text = "";
-                    this.file = "";
+                    this.files = "";
                     this.$refs.file.value = "";
                 } catch (err) {
                     throw err;
@@ -108,4 +130,9 @@ export default {
 </script>
 
 <style scoped>
+.text-display {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 </style>

@@ -8,22 +8,30 @@
         >
             <b-card no-body class="overflow-hidden d-flex flex-column justify-content-around cards">
                 <b-row no-gutters>
-                    <b-col class="col-md-3 d-flex justify-content-center align-content-center">
-                        <div style="width:100%;height:100%;font-size:5.7rem;text-align:center;">
-                            <i class="fas fa-file-alt" v-if="!item.isImg"></i>
-                            <i class="fas fa-file-image" v-if="item.isImg"></i>
+                    <div class="col-3 text-center px-1" style="font-size:5.4rem;">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="col-9">
+                        <div class="card-body px-3">
+                            <h5 class="card-title text-display text-left">{{item.originalname}}</h5>
+                            <b-row no-gutters>
+                                <b-col class="col-6">
+                                    <p class="card-text text-display text-left">
+                                        <small class="text-muted">Desc:</small>
+                                        <br />
+                                        {{item.description === "" ? item.description = "No description" : item.description}}
+                                    </p>
+                                </b-col>
+                                <b-col class="col-5 ml-auto">
+                                    <p class="card-text text-display text-left">
+                                        <small class="text-muted">CreatedAt:</small>
+                                        <br />
+                                        <i>{{`${item.createdAt.getDate()}/${item.createdAt.getMonth()+1}/${item.createdAt.getFullYear()}`}}</i>
+                                    </p>
+                                </b-col>
+                            </b-row>
                         </div>
-                    </b-col>
-                    <b-col class="col-9">
-                        <b-card-body>
-                            <b-card-title class="text-display text-left">{{item.originalname}}</b-card-title>
-                            <b-card-text class="text-display text-left">
-                                <small class="text-muted">Desc:</small>
-                                <br />
-                                {{item.description === "" ? item.description = "No description" : item.description}}
-                            </b-card-text>
-                        </b-card-body>
-                    </b-col>
+                    </div>
                 </b-row>
                 <b-row no-gutters>
                     <b-col class="col-12 m-auto d-flex justify-content-around">
@@ -48,7 +56,6 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import axios from "axios";
-import fs from "fs";
 
 export default {
     name: "Collections",
@@ -59,8 +66,6 @@ export default {
             this.$bvModal
                 .msgBoxConfirm("Confirm delete this item?", { okTitle: "Yes" })
                 .then(value => {
-                    // this.deleteMsg = value;
-                    // console.log(this.deleteMsg);
                     if (value) {
                         this.deleteCollection(id);
                     }
@@ -88,7 +93,9 @@ export default {
                     document.body.removeChild(downloadElement); //下载完成移除元素
                     window.URL.revokeObjectURL(href); //释放掉blob对象
                 })
-                .catch(err => console.log(err));
+                .catch(err => {
+                    throw err;
+                });
         }
     },
     created() {

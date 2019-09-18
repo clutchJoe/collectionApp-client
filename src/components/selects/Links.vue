@@ -2,24 +2,26 @@
     <b-row no-gutters id="collections">
         <b-col
             class="col-12 mx-auto mb-3"
-            v-for="(item, index) in allNotes"
+            v-for="(item, index) in allLinks"
             :key="item._id"
             :index="index"
         >
-            <div class="card mb-3 overflow-hidden d-flex flex-column justify-content-around cards">
-                <div class="row no-gutters">
-                    <div class="col-3 text-center px-1" style="font-size:5.4rem;">
-                        <i class="fas fa-clipboard"></i>
+            <b-card no-body class="overflow-hidden d-flex flex-column justify-content-around cards">
+                <b-row no-gutters>
+                    <div class="col-3 text-center px-1" style="font-size:5rem;">
+                        <i class="fas fa-link"></i>
                     </div>
                     <div class="col-9">
                         <div class="card-body px-3">
-                            <h5 class="card-title text-display text-left">{{item.topic}}</h5>
+                            <h5
+                                class="card-title text-display text-left mb-1"
+                            >{{item.title === "" ? item.title = "No Title" : item.title}}</h5>
                             <b-row no-gutters>
                                 <b-col class="col-6">
                                     <p class="card-text text-display text-left">
                                         <small class="text-muted">Desc:</small>
                                         <br />
-                                        {{item.note}}
+                                        {{item.description === "" ? item.description = "No description" : item.description}}
                                     </p>
                                 </b-col>
                                 <b-col class="col-5 ml-auto">
@@ -30,9 +32,12 @@
                                     </p>
                                 </b-col>
                             </b-row>
+                            <b-row no-gutters>
+                                <p class="text-muted text-truncate mb-1">{{item.domain}}</p>
+                            </b-row>
                         </div>
                     </div>
-                </div>
+                </b-row>
                 <b-row no-gutters>
                     <b-col class="col-12 m-auto d-flex justify-content-around">
                         <b-button @click="showMsg(item._id)" class="btn-danger btns">
@@ -41,7 +46,7 @@
                         </b-button>
                     </b-col>
                 </b-row>
-            </div>
+            </b-card>
         </b-col>
     </b-row>
 </template>
@@ -50,16 +55,16 @@
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-    name: "Notes",
+    name: "Links",
     methods: {
-        ...mapActions(["fetchNotes", "deleteNote"]),
+        ...mapActions(["fetchLinks", "deleteLink"]),
         showMsg(id) {
             this.deleteMsg = "";
             this.$bvModal
                 .msgBoxConfirm("Confirm delete this item?", { okTitle: "Yes" })
                 .then(value => {
                     if (value) {
-                        this.deleteNote(id);
+                        this.deleteLink(id);
                     }
                 })
                 .catch(err => {
@@ -68,9 +73,9 @@ export default {
         }
     },
     created() {
-        this.fetchNotes();
+        this.fetchLinks();
     },
-    computed: mapGetters(["allNotes"])
+    computed: mapGetters(["allLinks"])
 };
 </script>
 
