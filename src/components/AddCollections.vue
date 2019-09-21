@@ -2,7 +2,7 @@
     <b-row class="mb-3" id="add-collections">
         <b-col class="col-md-8 m-auto shadow">
             <h1 class="h1" id="title">clutch collection</h1>
-            <form action="http://localhost:4444/logout?_method=DELETE" method="POST" class="mb-3">
+            <form action="/logout?_method=DELETE" method="POST" class="mb-3">
                 <button type="submit" class="btn btn-secondary">
                     Log Out
                     <i class="fas fa-sign-out-alt ml-2"></i>

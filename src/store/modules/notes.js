@@ -12,7 +12,7 @@ const getters = {
 const actions = {
     async fetchNotes({ commit }) {
         try {
-            const response = await axios.get("http://localhost:4444/notes");
+            const response = await axios.get("/notes");
             commit("setNotes", response.data);
         } catch (err) {
             throw err;
@@ -20,7 +20,7 @@ const actions = {
     },
     async addNotes({ commit }, formData) {
         try {
-            await axios.post("http://localhost:4444/post/note", formData);
+            await axios.post("/post/note", formData);
             await this._actions.fetchNotes[0]();
         } catch (err) {
             throw err;
@@ -28,7 +28,7 @@ const actions = {
     },
     async deleteNote({ commit }, id) {
         try {
-            await axios.delete(`http://localhost:4444/notes/${id}`);
+            await axios.delete(`/notes/${id}`);
             commit("removeNote", id);
         } catch (err) {
             throw err;

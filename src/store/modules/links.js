@@ -11,7 +11,7 @@ const getters = {
 const actions = {
     async fetchLinks({ commit }) {
         try {
-            const response = await axios.get("http://localhost:4444/links");
+            const response = await axios.get("/links");
             commit("setLinks", response.data);
         } catch (err) {
             throw err;
@@ -19,7 +19,7 @@ const actions = {
     },
     async addLink({ commit }, formData) {
         try {
-            await axios.post("http://localhost:4444/post/link", formData);
+            await axios.post("/post/link", formData);
             await this._actions.fetchLinks[0]();
         } catch (err) {
             throw err;
@@ -27,7 +27,7 @@ const actions = {
     },
     async deleteLink({ commit }, id) {
         try {
-            await axios.delete(`http://localhost:4444/links/${id}`);
+            await axios.delete(`/links/${id}`);
             commit("removeLink", id);
         } catch (err) {
             throw err;

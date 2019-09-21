@@ -76,7 +76,7 @@ export default {
         },
         downloadFile(filename, originalname, type) {
             return axios({
-                url: `http://localhost:4444/download/${filename}`,
+                url: `/download/${filename}`,
                 method: "post",
                 responseType: "blob"
             })

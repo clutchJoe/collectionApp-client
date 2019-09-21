@@ -12,7 +12,7 @@ const getters = {
 const actions = {
     async fetchCollections({ commit }) {
         try {
-            const response = await axios.get("http://localhost:4444/files");
+            const response = await axios.get("/files");
             commit("setCollections", response.data);
         } catch (err) {
             throw err;
@@ -20,7 +20,7 @@ const actions = {
     },
     async addCollection({ commit }, formData) {
         try {
-            await axios.post("http://localhost:4444/post/file", formData);
+            await axios.post("post/file", formData);
             // post之后，再次执行上面的fetchCollections函数，更新数据
             await this._actions.fetchCollections[0]();
         } catch (err) {
@@ -29,7 +29,7 @@ const actions = {
     },
     async deleteCollection({ commit }, id) {
         try {
-            await axios.delete(`http://localhost:4444/files/${id}`);
+            await axios.delete(`/files/${id}`);
             commit("removeCollection", id);
         } catch (err) {
             throw err;
